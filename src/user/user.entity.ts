@@ -8,6 +8,9 @@ export class UserEntity {
   id: ObjectID;
 
   @Column()
+  username: string;
+
+  @Column()
   @IsEmail()
   email: string;
 
