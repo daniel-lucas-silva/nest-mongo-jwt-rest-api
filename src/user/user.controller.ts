@@ -2,6 +2,7 @@ import { Get, Post, Body, Put, Delete, Param, Controller, UsePipes, Query } from
 import { ApiUseTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @ApiBearerAuth()
 @ApiUseTags('user')
@@ -21,7 +22,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'The user has been successfully created.'})
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @Post()
-  async create(@Body() userData) {}
+  async create(@Body() userData: CreateUserDto) {}
 
   @ApiOperation({ title: 'Update user' })
   @ApiResponse({ status: 201, description: 'The user has been successfully updated.'})
