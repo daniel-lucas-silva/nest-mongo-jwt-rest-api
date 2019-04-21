@@ -19,8 +19,8 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV === 'development') {
     const options = new DocumentBuilder()
-    .setTitle('Fazendo Mais App')
-    .setDescription('The Fazendo Mais API description')
+    .setTitle('Nest App')
+    .setDescription('The Nest API description')
     .setVersion('1.0')
     .setBasePath('api')
     .addBearerAuth()
