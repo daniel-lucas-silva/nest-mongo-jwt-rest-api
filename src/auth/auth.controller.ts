@@ -1,4 +1,5 @@
-import { Get, Post, Body, Put, Delete, Param, Controller, UsePipes, Query } from '@nestjs/common';
+import { Get, Post, Body, Put, Delete, Param, Controller, UsePipes, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -18,6 +19,7 @@ export class AuthController {
   @Post()
   async resetPassword(@Body() userData) {}
 
-  @Post()
-  async getRefreshToken(@Body() userData) {}
+  @Get()
+  @UseGuards(AuthGuard())
+  async getRefreshToken() {}
 }
