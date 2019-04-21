@@ -21,4 +21,8 @@ export class UserService {
   async findById() {}
 
   async findByEmail() {}
+
+  async userExistsExcludingItself() {}
+
+  async userExists() {}
 }
