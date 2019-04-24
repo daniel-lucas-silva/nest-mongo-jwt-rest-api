@@ -1,9 +1,10 @@
 import { Column, Entity, ObjectID, ObjectIdColumn, BeforeInsert } from 'typeorm';
 import { IsEmail } from 'class-validator';
-import * as crypto from 'crypto';
+import { hashSync } from 'bcrypt';
 
 @Entity('user')
 export class UserEntity {
+
   @ObjectIdColumn()
   id: ObjectID;
 
@@ -34,6 +35,6 @@ export class UserEntity {
 
   @BeforeInsert()
   hashPassword() {
-    this.password = crypto.createHmac('sha256', this.password).digest('hex');
+    this.password = hashSync(this.password, 10);
   }
 }

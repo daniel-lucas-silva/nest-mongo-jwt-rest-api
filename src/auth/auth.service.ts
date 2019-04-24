@@ -1,65 +1,61 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { compareSync } from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 
 import { UserService } from '../user/user.service';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
 
-  constructor(
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly userService: UserService) { }
 
-  async createToken() {
-    const user: JwtPayload = { email: 'test@email.com' };
-    const accessToken = this.jwtService.sign(user);
-    return {
-      expiresIn: 3600,
-      accessToken,
-    };
+  generateToken(user) {
+    const today = new Date();
+    const exp = new Date(today);
+    exp.setDate(today.getDate() + 60);
+
+    return jwt.sign({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      exp: exp.getTime() / 1000,
+    }, process.env.JWT_SECRET);
   }
 
-  async validateUser(payload: JwtPayload): Promise<any> {
+  async validateUser(payload): Promise<any> {
     // put some validation logic here
     // for example query user by id/email/username
     return { payload };
   }
 
-  async saveUserAccessAndReturnToken() {}
+  async blockUser() { }
 
-  async blockUser() {}
+  async findUser(findOptions: object) {
+    return await this.userService.findOne(findOptions);
+  }
 
-  async saveLoginAttemptsToDB() {}
+  public async signUp(dto: RegisterDto) {
+    const { username, email } = dto;
 
-  async blockIsExpired() {}
+    const user = await this.userService.findOne({ $or: [ { username }, { email } ] });
 
-  async checkLoginAttemptsAndBlockExpires() {}
+    if (user) {
+      const errors = {username: 'Username and email must be unique.'};
+      throw new HttpException({message: 'Input data validation failed', errors}, HttpStatus.BAD_REQUEST);
+    }
 
-  async passwordsDoNotMatch() {}
+    // create new user
+    return this.userService.create(dto)
+      .then(user => {
+        // send mail
+        return {
+          token: this.generateToken(user),
+        };
+      });
+  }
 
-  async registerUser() {}
-
-  async returnRegisterToken() {}
-
-  async verificationExists() {}
-
-  async verifyUser() {}
-
-  async markResetPasswordAsUsed() {}
-
-  async findUserToResetPassword() {}
-
-  async updatePassword() {}
-
-  async findForgotPassword() {}
-
-  async saveForgotPassword() {}
-
-  async forgotPasswordResponse() {}
-
-  async checkPermissions() {}
-
-  async getUserIdFromToken() {}
+  async checkPassword(password, user) {
+    return await compareSync(password, user.password);
+  }
 }
