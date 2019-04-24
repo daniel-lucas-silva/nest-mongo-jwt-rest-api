@@ -4,8 +4,8 @@ import { Connection } from 'typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-
+import { AuthMiddleware } from './common/middleware/auth.middleware';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -13,6 +13,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
     UserModule,
     AuthModule,
     PostModule,
+    MailerModule,
   ],
 })
 export class AppModule implements NestModule {
@@ -20,7 +21,7 @@ export class AppModule implements NestModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(LoggerMiddleware)
-      .forRoutes({ path: 'users', method: RequestMethod.GET });
+      .apply(AuthMiddleware)
+      .forRoutes('*');
   }
 }
